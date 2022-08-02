@@ -7,6 +7,7 @@ const pool = new Pool({
   port: 5432,
 })
 
+
 const signIn = (request, response) => {
   const { email, password } = request.body
   pool.query('SELECT * FROM users WHERE email= $1 AND password = $2', [email, password], (error, results) => {
