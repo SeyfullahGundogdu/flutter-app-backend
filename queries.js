@@ -1,4 +1,5 @@
 const Pool = require('pg').Pool
+var path = require('path');
 const pool = new Pool({
   user: 'postgres',
   host: 'localhost',
@@ -6,7 +7,6 @@ const pool = new Pool({
   password: 'admin',
   port: 5432,
 })
-
 
 const signIn = (request, response) => {
   const { email, password } = request.body
@@ -50,7 +50,16 @@ const getUsers = (request, response) => {
       response.status(200).json(results.rows)
     })
   }
-
+  const getFilteredPosts = (request, response) => {
+    const post_title = request.params.post_title
+    const user_id = path.dirname(request.url).split("/").pop()
+    pool.query('SELECT * FROM posts WHERE user_id=$1 AND post_title=$2 ORDER BY post_date DESC',[user_id, post_title], (error, results) => {
+      if (error) {
+        return response.status(400).send(error.message)
+      }
+      response.status(200).json(results.rows)
+    })
+  }
 const getUserById = (request, response) => {
     const id = parseInt(request.params.id)
   
@@ -106,5 +115,6 @@ module.exports = {
     getUserById,
     updateUser,
     deleteUser,
-    getPosts
+    getPosts,
+    getFilteredPosts
 }

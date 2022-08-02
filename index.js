@@ -19,7 +19,7 @@ app.delete('/users/:id', db.deleteUser)
 app.post('/register', db.registerUser)
 app.post('/signin', db.signIn)
 app.get('/getposts/:id',db.getPosts)
-
+app.get('/getposts/*/:post_title',db.getFilteredPosts)
 app.listen(port, () => {
     console.log(`App running on port ${port}.`)
   })
