@@ -21,13 +21,14 @@ const signIn = (request, response) => {
 }
 
 const registerUser =(request, response) => {
-  const { accMail, accPass} = request.body
-  if (!(accMail || accPass)) {
-    return response.status(400).send('email or password empty, fill in the necessary fields.')
+  const { name, email, phone_number, password } = request.body
+  if(!(name &&email && phone_number && password)){
+    return response.status(400).send("One or more fields are empty.");
   }
-  pool.query('INSERT INTO Accounts(accMail, accPass) VALUES ($1, $2)', [accMail, accPass], (error, results) => {
+  pool.query('INSERT INTO users (name, email, phone_number, password) values ($1, $2, $3, $4)',
+   [name, email, phone_number, password], (error, results) => {
     if (error) {
-      return response.status(400).send(error.message)
+      return response.status(200).send(error.message)
     }
     response.status(200).json(results.rows)
   })
