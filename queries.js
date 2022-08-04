@@ -25,7 +25,7 @@ const registerUser =(request, response) => {
   if(!(name &&email && phone_number && password)){
     return response.status(400).send("One or more fields are empty.");
   }
-  pool.query('INSERT INTO users (name, email, phone_number, password) values ($1, $2, $3, $4)',
+  pool.query('INSERT INTO users (name, email, phone_number, password) values ($1, $2, $3, $4) RETURNING *',
    [name, email, phone_number, password], (error, results) => {
     if (error) {
       return response.status(200).send(error.message)
@@ -33,7 +33,19 @@ const registerUser =(request, response) => {
     response.status(200).json(results.rows)
   })
 }
-
+const addPost = (request, response) => {
+  const user_id = request.params.id
+  const { postTitle, postArticle } = request.body
+  console.log(user_id, postTitle, postArticle)
+  pool.query(
+    'INSERT INTO posts (user_id, post_title, post_article, post_date) VALUES ($1, $2, $3, to_timestamp($4)) RETURNING *',
+    [user_id, postTitle, postArticle, Date.now() / 1000], (error, results) => {
+    if (error) {
+      return response.status(400).send(error)
+    }
+    response.status(201).send(`${results.rowCount}`)
+  })
+}
 const getUsers = (request, response) => {
     pool.query('SELECT * FROM users ORDER BY user_id ASC', (error, results) => {
       if (error) {
@@ -54,7 +66,7 @@ const getUsers = (request, response) => {
   const getFilteredPosts = (request, response) => {
     const post_title = request.params.post_title
     const user_id = path.dirname(request.url).split("/").pop()
-    pool.query('SELECT * FROM posts WHERE user_id=$1 AND post_title=$2 ORDER BY post_date DESC',[user_id, post_title], (error, results) => {
+    pool.query("SELECT * FROM posts WHERE user_id=$1 AND post_title LIKE '%'||$2||'%' ORDER BY post_date DESC",[user_id, post_title], (error, results) => {
       if (error) {
         return response.status(400).send(error.message)
       }
@@ -117,5 +129,6 @@ module.exports = {
     updateUser,
     deleteUser,
     getPosts,
-    getFilteredPosts
+    getFilteredPosts,
+    addPost
 }
