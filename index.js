@@ -20,6 +20,7 @@ app.post('/register', db.registerUser)
 app.post('/signin', db.signIn)
 app.get('/getposts/:id',db.getPosts)
 app.get('/getposts/*/:post_title',db.getFilteredPosts)
+app.post('/addpost/:id',db.addPost)
 app.listen(port, () => {
     console.log(`App running on port ${port}.`)
   })
