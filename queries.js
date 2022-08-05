@@ -16,7 +16,7 @@ const signIn = (request, response) => {
     if (results.rowCount == 0) {
       return response.status(404).send("No user with specified credentials.")
     }
-    return response.status(200).json(results.rows)
+    return response.status(200).json(results.rows[0])
   })
 }
 
